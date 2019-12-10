@@ -1,0 +1,15 @@
+1、数据准备:以小时为单位的用户行为数据
+2、数据预处理及deepwalk(路径需要修改)
+a. 利用deepwalk/deepwalk中的process.py生成video_dict（vid与数字对应字典）和用数字表示的用户行为数据session_data_hour
+   注：此处数字并未处理为以视频出现频次排序的index，仅仅为了deepwalk处理方便
+b. python __main__.py --input session_data_hour --output video生成deepwalk后的所有路径video.walks.0
+c. 利用process.py将生成的video.walks.0转换为原始vid序列存为文件sentences.txt，在skip-gram-try-fine.py中进行后续处理
+d. 利用get_url_by_docid.py获取video.walks.0中的视频的类别和兴趣点信息存于video_category.json和video_interests.json
+e. 利用a.py对于video_category.json和video_interests.json中的格式进行转换方便加载
+f. 用process.py将sentences.txt去掉换行符存为words.txt方便统计频次
+
+3、skip-gram
+a. 读入words.txt统计频次，将index对应vid的字典存于dictionary1和reverse_dictionary1,有默认UNK的缩小版字典为dictionary和reverse_dictionary
+b. 读入sentences.txt将vid按频次排序的序号转换为index_sentences.txt统计频次（vocabulary_size为缩小版vid个数，vocabulary_size1为全部vid个数）
+c. 调用train()函数直接训练，predict()函数生成test-hour.npy result-hour.txt得到视频embedding，test()函数统计MAP和NDCG
+   注：模型存于wordwVec_model1.py
